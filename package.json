@@ -15,7 +15,7 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
-    "build": "tsc & prisma generate",
+    "build": "tsc",
     "start": "node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"tsc --watch\" \"nodemon --watch dist dist/app.js\""
