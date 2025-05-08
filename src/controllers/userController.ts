@@ -14,8 +14,10 @@ async function main(){
 export function userListController(req: Request, res: Response){
     let users: User[] | undefined = undefined;
     main()
-    .then(async ()=>{
-
+    .then(async (users)=>{
+        res.json({
+            "users": users
+        })
         await prisma.$disconnect();
     })
 
@@ -27,9 +29,9 @@ export function userListController(req: Request, res: Response){
         await prisma.$disconnect();
         process.exit(1);
     })
-    res.json({
-        "users": users
-    })
+    // res.json({
+    //     "users": users
+    // })
 
 }
 
