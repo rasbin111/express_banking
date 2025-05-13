@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename)
 const port = process.env.PORT;
 
 const app = express();
+app.use(express.json());
 
 app.set("views", path.join(__dirname, "../views"))
 app.set("view engine", "pug")
