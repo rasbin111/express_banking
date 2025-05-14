@@ -43,7 +43,6 @@ export default function verifyToken(
     }
 
     const { id } = decoded as UserJwtPayload;
-    console.log(id);
     req.currentUserId = id;
 
     prisma.user
