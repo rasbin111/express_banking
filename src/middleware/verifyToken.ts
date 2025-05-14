@@ -1,13 +1,22 @@
 import "dotenv/config";
-import { PrismaClient } from "../../generated/prisma/index.js";
+import { PrismaClient, Prisma } from "../../generated/prisma/index.js";
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, {JwtPayload} from "jsonwebtoken";
 import { error } from "console";
 
 const prisma = new PrismaClient();
 
+interface UserJwtPayload extends JwtPayload{
+  id: string;
+}
+
+interface UserRequest extends Request{
+  currentUserId: string;
+  user: Prisma.UserCreateInput;
+}
+
 export default function verifyToken(
-  req: Request,
+  req: UserRequest,
   res: Response,
   next: NextFunction
 ) {
@@ -33,17 +42,19 @@ export default function verifyToken(
       });
     }
 
-    const { id } = decoded;
+    const { id } = decoded as UserJwtPayload;
     console.log(id);
     req.currentUserId = id;
 
     prisma.user
       .findUnique({
-        where: { id: id },
+        where: { id: parseInt(id) },
       })
       .then((user) => {
-        req.user = user;
-        next();
+        if (user){
+          req.user = user;
+          next();
+        }
       })
       .catch((err) => {
         return res.status(400).json({
