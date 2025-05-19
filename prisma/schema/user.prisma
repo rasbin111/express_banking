@@ -1,0 +1,16 @@
+model Profile {
+    id     Int     @id @default(autoincrement())
+    bio    String?
+    user   User    @relation(fields: [userId], references: [id])
+    userId Int     @unique
+}
+
+model User {
+    id           Int      @id @default(autoincrement())
+    email        String   @unique
+    password     String   @default("password") @db.VarChar(200)
+    name         String?
+    profile      Profile?
+    secret2FA    String?
+    is2FAEnabled Boolean  @default(false)
+}
