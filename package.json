@@ -31,17 +31,13 @@
         "express": "^5.1.0",
         "helmet": "^8.1.0",
         "jsonwebtoken": "^9.0.2",
-        "pug": "^3.0.3",
-        "qrcode": "^1.5.4",
-        "speakeasy": "^2.0.0"
+        "pug": "^3.0.3"
     },
     "devDependencies": {
         "@types/bcrypt": "^5.0.2",
         "@types/express": "^5.0.1",
         "@types/jsonwebtoken": "^9.0.9",
         "@types/node": "^22.15.14",
-        "@types/qrcode": "^1.5.5",
-        "@types/speakeasy": "^2.0.10",
         "concurrently": "^9.1.2",
         "nodemon": "^3.1.10",
         "prisma": "^6.8.2",
