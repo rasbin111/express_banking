@@ -16,8 +16,9 @@ const app = express();
 app.use(cors({
     origin: "http://localhost:3000",
 }));
+
 // should enable it for security 
-// app.use(helmet());
+app.use(helmet());
 
 app.use(express.json());
 
