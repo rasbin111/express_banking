@@ -22,7 +22,7 @@
         "start": "node dist/app.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "concurrently \"tsc --watch\" \"nodemon --watch dist dist/app.js\"",
-        "db:generate": "npx prisma generate dev --schema=./prisma/schema/"
+        "db:generate": "npx prisma migrate dev --schema=./prisma/schema/"
     },
     "dependencies": {
         "@prisma/client": "^6.8.2",

@@ -1,16 +1,16 @@
 model Profile {
-    id     Int     @id @default(autoincrement())
-    bio    String?
-    user   User    @relation(fields: [userId], references: [id])
-    userId Int     @unique
+  id     Int     @id @default(autoincrement())
+  bio    String?
+  userId Int     @unique
+  user   User    @relation(fields: [userId], references: [id])
 }
 
 model User {
-    id           Int      @id @default(autoincrement())
-    email        String   @unique
-    password     String   @default("password") @db.VarChar(200)
-    name         String?
-    profile      Profile?
-    secret2FA    String?
-    is2FAEnabled Boolean  @default(false)
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String?
+  password     String   @default("password") @db.VarChar(200)
+  isMFAEnabled Boolean  @default(false)
+  secretMFA    String?
+  profile      Profile?
 }
