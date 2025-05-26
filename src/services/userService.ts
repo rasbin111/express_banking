@@ -4,6 +4,15 @@ import speakeasy from "speakeasy";
 
 const prisma = new PrismaClient();
 
+export async function userByIdService(id: number){
+  const user = await prisma.user.findUnique({
+    where: {
+      id: id
+    }
+  });
+  return user;
+}
+
 export async function userListService() {
   const users = await prisma.user.findMany();
   return users;
@@ -32,11 +41,9 @@ export async function userUpdateService(data: any) {
       id: parseInt(data.id),
     },
     data: {
-      ...data,
+      ...data
     },
   });
-  console.log("***************************************")
-  console.log(data.id)
 }
 
 export function getMFACode({ email }: { email?: string }): {
@@ -45,6 +52,7 @@ export function getMFACode({ email }: { email?: string }): {
 } {
   const secret = speakeasy.generateSecret({
     name: `${process.env.APP_NAME} | ${email}`,
+    length: 20
   });
   return {
     otpauthUrl: secret.otpauth_url ?? "",
@@ -52,14 +60,16 @@ export function getMFACode({ email }: { email?: string }): {
   };
 }
 
-export const vertifyMFACode = async (code: string, user: Prisma.UserCreateInput) => {
+export const verifyMFACode = async (code: string, user: Prisma.UserCreateInput) => {
+  console.log()
   if (user.secretMFA) {
-    return speakeasy.totp.verify({
+    const codeValidity = speakeasy.totp.verify({
       secret: user.secretMFA,
       encoding: "base32",
       token: code,
-      window: 1, // default 0
+      window: 2, // default 0, for security reasons 0 is the best
     });
+    return codeValidity
   } else {
     return false
   }

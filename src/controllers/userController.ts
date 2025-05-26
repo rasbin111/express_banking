@@ -1,15 +1,16 @@
 import "dotenv/config";
 import { PrismaClient, Prisma } from "../../generated/prisma/index.js";
 import QRCode from "qrcode";
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import {
   userListService,
   userCreateService,
   loginService,
   getMFACode,
-  vertifyMFACode,
+  verifyMFACode,
   userUpdateService,
+  userByIdService
 } from "../services/userService.js";
 import jwt from "jsonwebtoken";
 
@@ -95,10 +96,14 @@ export const generateQRCodeController = async (
 ) => {
   try {
     const user = req.user;
-    const { otpauthUrl, base32 } = getMFACode({ email: user.email });
-    userUpdateService({ ...user, secretMFA: base32 });
-    const qr = await QRCode.toDataURL(otpauthUrl);
-    return res.status(200).json({ data: qr });
+    if (!user.secretMFA){
+      const { otpauthUrl, base32 } = getMFACode({ email: user.email });
+      userUpdateService({ ...user, secretMFA: base32 });
+      const qr = await QRCode.toDataURL(otpauthUrl);
+      return res.status(200).json({ data: qr });
+    } else{
+      return res.status(409).json({error: "Already has QR code"})
+    }
   } catch (error) {
     return res.status(500).json({ error: "Couldn't create QR Code" });
   }
@@ -109,19 +114,48 @@ export const enableMFAController = async (
   res: Response
 ) => {
   const user = req.user;
-  vertifyMFACode(req.body.code, user)
+  verifyMFACode(req.body.code, user)
     .then((isCodeValid) => {
       if (isCodeValid) {
-        userUpdateService({ ...user, isMFAEnabled: true });
-        return response.status(200).json({ user: user });
+        userUpdateService({ ...user, isMFAEnabled: true })
+        .then(()=>{
+          userByIdService(user.id)
+          .then((userById)=>{
+            return res.status(200).json({ user: userById });
+          })
+          })
       } else {
-        return response.status(500).json({ error: "Invalid Code" });
+        return res.status(500).json({ error: "Invalid Code" });
       }
     })
 
     .catch(() => {
       return res
         .status(500)
-        .json({ error: "Couldn't verify code and MFA enabling failed" });
+        .json({ error: `Couldn't verify code and MFA enabling failed` });
+    });
+};
+
+export const removeMFAController = async (
+  req: RequestWithUser,
+  res: Response
+) => {
+  const user = req.user;
+  verifyMFACode(req.body.code, user)
+    .then((isCodeValid) => {
+      if (isCodeValid) {
+        userUpdateService({ ...user, secretMFA: null, isMFAEnabled: false })
+        .then(()=>{
+          userByIdService(user.id)
+          .then((userById)=>{
+            return res.status(200).json({ user: userById });
+          })
+          })
+      } else {
+        return res.status(500).json({ error: "Invalid Code" });
+      }
+    })
+    .catch(() => {
+      return res.status(500).json({ error: "Can't remove MFA" });
     });
 };
