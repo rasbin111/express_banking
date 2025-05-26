@@ -1,7 +1,8 @@
 import "dotenv/config";
 import { PrismaClient, Prisma } from "../../generated/prisma/index.js";
-const prisma = new PrismaClient();
 import speakeasy from "speakeasy";
+
+const prisma = new PrismaClient();
 
 export async function userListService() {
   const users = await prisma.user.findMany();
@@ -25,8 +26,8 @@ export async function loginService(email: string) {
   return user;
 }
 
-export function userUpdateService(data: any) {
-  prisma.user.update({
+export async function userUpdateService(data: any) {
+  await prisma.user.update({
     where: {
       id: parseInt(data.id),
     },
@@ -34,6 +35,8 @@ export function userUpdateService(data: any) {
       ...data,
     },
   });
+  console.log("***************************************")
+  console.log(data.id)
 }
 
 export function getMFACode({ email }: { email?: string }): {
@@ -49,7 +52,7 @@ export function getMFACode({ email }: { email?: string }): {
   };
 }
 
-export const vertifyMFACode = (code: string, user: Prisma.UserCreateInput) => {
+export const vertifyMFACode = async (code: string, user: Prisma.UserCreateInput) => {
   if (user.secretMFA) {
     return speakeasy.totp.verify({
       secret: user.secretMFA,

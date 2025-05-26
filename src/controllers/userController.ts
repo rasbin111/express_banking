@@ -89,7 +89,10 @@ export async function loginController(req: Request, res: Response) {
     });
 }
 
-export const generateQRCode = async (req: RequestWithUser, res: Response) => {
+export const generateQRCodeController = async (
+  req: RequestWithUser,
+  res: Response
+) => {
   try {
     const user = req.user;
     const { otpauthUrl, base32 } = getMFACode({ email: user.email });
@@ -101,20 +104,24 @@ export const generateQRCode = async (req: RequestWithUser, res: Response) => {
   }
 };
 
-export const enableMFA = async (req: RequestWithUser, res: Response) => {
-  try {
-    const user = req.user;
-    const isCodeValid = await vertifyMFACode(req.body.code, user);
-    console.log(isCodeValid)
-    if (isCodeValid) {
-      userUpdateService({ ...user, isMFAEnabled: true });
-      return response.status(200).json({ user: user });
-    } else {
-      return response.status(500).json({ error: "Invalid Code" });
-    }
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "Couldn't verify code and MFA enabling failed" });
-  }
+export const enableMFAController = async (
+  req: RequestWithUser,
+  res: Response
+) => {
+  const user = req.user;
+  vertifyMFACode(req.body.code, user)
+    .then((isCodeValid) => {
+      if (isCodeValid) {
+        userUpdateService({ ...user, isMFAEnabled: true });
+        return response.status(200).json({ user: user });
+      } else {
+        return response.status(500).json({ error: "Invalid Code" });
+      }
+    })
+
+    .catch(() => {
+      return res
+        .status(500)
+        .json({ error: "Couldn't verify code and MFA enabling failed" });
+    });
 };

@@ -28,7 +28,7 @@ app.set("view engine", "pug");
 app.use("/static", express.static(path.join(__dirname, "../public")));
 
 app.use("/", indexRouter);
-app.use("/", userRouter);
+app.use("/users", userRouter);
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);

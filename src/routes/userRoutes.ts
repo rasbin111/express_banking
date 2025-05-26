@@ -1,12 +1,12 @@
 import { Router, RequestHandler } from "express";
-import { userListController, userCreateController, loginController, generateQRCode, enableMFA } from "../controllers/userController.js";
-import verifyToken from "../middleware/verifyToken.js";
+import { userListController, userCreateController, loginController, generateQRCodeController, enableMFAController } from "../controllers/userController.js";
+import verifyToken from "../middlewares/verifyToken.js";
 const userRouter = Router();
 
-userRouter.get("/users", [verifyToken as RequestHandler], userListController);
-userRouter.post("/users", userCreateController);
+userRouter.get("/", [verifyToken as RequestHandler], userListController);
+userRouter.post("/", userCreateController);
 userRouter.post("/login", loginController);
-userRouter.post("/generate-qr", [verifyToken as RequestHandler], generateQRCode);
-userRouter.post("/enable-mfa", [verifyToken as RequestHandler], enableMFA);
+userRouter.post("/generate-qr", [verifyToken as RequestHandler], generateQRCodeController);
+userRouter.post("/enable-mfa", [verifyToken], enableMFAController);
 
 export default userRouter;
