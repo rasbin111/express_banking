@@ -13,12 +13,10 @@ import {
   userByIdService
 } from "../services/userService.js";
 import jwt from "jsonwebtoken";
+import { RequestWithUser } from "../types/userTypes.js";
 
 const prisma = new PrismaClient();
 
-interface RequestWithUser extends Request {
-  user: Prisma.UserCreateInput;
-}
 
 export function userListController(req: Request, res: Response) {
   userListService()
