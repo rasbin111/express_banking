@@ -37,9 +37,6 @@ export function userListController(req: Request, res: Response) {
       await prisma.$disconnect();
       process.exit(1);
     });
-  // res.json({
-  //     "users": users
-  // })
 }
 
 export async function userCreateController(req: Request, res: Response) {

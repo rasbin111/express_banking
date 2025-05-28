@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import indexRouter from "./routes/index.js";
+import indexRouter from "./routes/homeRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import helmet from "helmet";
 import cors from "cors";
