@@ -5,7 +5,7 @@ import { DBPool } from "../db/index.js";
 
 export async function userByIdService(id: number) {
   const client = await DBPool.connect();
-  const result = await client.query(`select * from "User" where id=${id}`);
+  const result = await client.query(`select * from users where id=${id}`);
   client.release();
   const user = await result.rows[0];
   return user;
@@ -13,7 +13,7 @@ export async function userByIdService(id: number) {
 
 export async function userListService() {
   const client = await DBPool.connect();
-  const result = await client.query('select * from "User";');
+  const result = await client.query(`select * from users`);
   client.release();
   const users = result.rows;
   return users;
@@ -22,10 +22,10 @@ export async function userListService() {
 export async function userCreateService(user: User) {
   const client = await DBPool.connect();
   const result = await client.query(
-    `INSERT INTO "User" (email, name, password)
-         VALUES ($1, $2, $3)
+    `INSERT INTO users (email, name, password, role)
+         VALUES ($1, $2, $3, $4)
          RETURNING id`,
-    [user.email, user.name, user.password]
+    [user.email, user.name, user.password, user.role]
   );
   const id = result.rows[0].id;
   const createdUser = await userByIdService(id);
@@ -37,17 +37,17 @@ export async function userCreateService(user: User) {
 export async function loginService(email: string) {
   const client = await DBPool.connect();
 
-  const result = await client.query(`select * from "User" where email=$1`, [email]);
+  const result = await client.query(`select * from users where email=$1`, [email]);
   client.release();
   return result.rows[0]
 }
 
 export async function userUpdateService(data: User) {
   const client = await DBPool.connect();
-  const result = await client.query(`update "User" 
-    set name=$1, email=$2, "isMFAEnabled"=$3, "secretMFA"=$4
-    where id=$5
-    returning id`, [data.name, data.email, data.isMFAEnabled, data.secretMFA, data.id]);
+  const result = await client.query(`update users
+    set name=$1, email=$2, is_mfa_enabled=$3, secret_mfa=$4, role=$5
+    where id=$6
+    returning id`, [data.name, data.email, data.is_mfa_enabled, data.secret_mfa, data.role, data.id]);
   const user = userByIdService(result.rows[0].id)
   client.release();
   return user
@@ -69,9 +69,9 @@ export function getMFACode({ email }: { email?: string }): {
 
 export const verifyMFACode = async (code: string, user: User) => {
   console.log()
-  if (user.secretMFA) {
+  if (user.secret_mfa) {
     const codeValidity = speakeasy.totp.verify({
-      secret: user.secretMFA,
+      secret: user.secret_mfa,
       encoding: "base32",
       token: code,
       window: 2, // default 0, for security reasons 0 is the best

@@ -14,8 +14,9 @@ export type User = {
     email: string;
     name?: string;
     password?: string;
-    isMFAEnabled: boolean;
-    secretMFA?: string;
+    is_mfa_enabled: boolean;
+    secret_mfa?: string | null;
+    role: string;
     // profile?: Profile;
 
 }

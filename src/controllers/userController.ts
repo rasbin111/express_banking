@@ -34,7 +34,6 @@ export function userListController(req: Request, res: Response) {
 
 export async function userCreateController(req: Request, res: Response) {
   const userInfo = await req.body;
-  // const SECRET = process.env.SECRET || "DEFAULT_SECRET";
   const hashedPassword = await bcrypt.hash(userInfo["password"], 10);
   userInfo["password"] = hashedPassword;
   userCreateService(userInfo)
@@ -86,9 +85,9 @@ export const generateQRCodeController = async (
 ) => {
   try {
     const user = req.user;
-    if (!user.secretMFA){
+    if (!user.secret_mfa){
       const { otpauthUrl, base32 } = getMFACode({ email: user.email });
-      userUpdateService({ ...user, secretMFA: base32 });
+      userUpdateService({ ...user, secret_mfa: base32 });
       const qr = await QRCode.toDataURL(otpauthUrl);
       return res.status(200).json({ data: qr });
     } else{
@@ -107,7 +106,7 @@ export const enableMFAController = async (
   verifyMFACode(req.body.code, user)
     .then((isCodeValid) => {
       if (isCodeValid) {
-        userUpdateService({ ...user, isMFAEnabled: true })
+        userUpdateService({ ...user, is_mfa_enabled: true })
         .then(()=>{
           userByIdService(user.id)
           .then((userById)=>{
@@ -134,7 +133,7 @@ export const removeMFAController = async (
   verifyMFACode(req.body.code, user)
     .then((isCodeValid) => {
       if (isCodeValid) {
-        userUpdateService({ ...user, secretMFA: null, isMFAEnabled: false })
+        userUpdateService({ ...user, secret_mfa: null, is_mfa_enabled: false })
         .then(()=>{
           userByIdService(user.id)
           .then((userById)=>{

@@ -9,7 +9,7 @@ export default function verifyToken(
   res: Response,
   next: NextFunction
 ) {
-  const SECRET = process.env.SECRET || "DEFUALTSECRET";
+  const SECRET = process.env.SECRET || "DEFUALT_SECRET";
 
   let token =
     req.headers["x-access-token"] &&

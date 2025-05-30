@@ -11,7 +11,7 @@ import verifyToken from "../middlewares/verifyToken.js";
 
 const userRouter = Router();
 
-userRouter.get("/", userListController);
+userRouter.get("/", [verifyToken], userListController);
 userRouter.post("/", userCreateController);
 userRouter.post("/login", loginController);
 userRouter.post(
