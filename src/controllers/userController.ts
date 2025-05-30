@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { PrismaClient, Prisma } from "../../generated/prisma/index.js";
 import QRCode from "qrcode";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
@@ -15,8 +14,6 @@ import {
 import jwt from "jsonwebtoken";
 import { RequestWithUser } from "../types/userTypes.js";
 
-const prisma = new PrismaClient();
-
 
 export function userListController(req: Request, res: Response) {
   userListService()
@@ -24,7 +21,6 @@ export function userListController(req: Request, res: Response) {
       res.json({
         users: users,
       });
-      await prisma.$disconnect();
     })
 
     .catch(async (e) => {
@@ -32,15 +28,14 @@ export function userListController(req: Request, res: Response) {
         users: [],
       });
       console.log(e);
-      await prisma.$disconnect();
       process.exit(1);
     });
 }
 
 export async function userCreateController(req: Request, res: Response) {
   const userInfo = await req.body;
-  const SECRET = process.env.SECRET || "DEFAULT_SECRET";
-  const hashedPassword = await bcrypt.hash(SECRET, 10);
+  // const SECRET = process.env.SECRET || "DEFAULT_SECRET";
+  const hashedPassword = await bcrypt.hash(userInfo["password"], 10);
   userInfo["password"] = hashedPassword;
   userCreateService(userInfo)
     .then((user) => {

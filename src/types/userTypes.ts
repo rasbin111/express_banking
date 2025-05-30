@@ -1,6 +1,6 @@
 import {Request} from "express";
 import { JwtPayload } from "jsonwebtoken";
-import { Prisma } from "@prisma/client";
+
 
 type Profile = {
     id: number;
@@ -9,19 +9,19 @@ type Profile = {
     user: User;
 }
 
-type User = {
+export type User = {
     id: number;
     email: string;
     name?: string;
     password?: string;
     isMFAEnabled: boolean;
     secretMFA?: string;
-    profile?: Profile;
+    // profile?: Profile;
 
 }
 
 export interface RequestWithUser extends Request{
-    user: Prisma.UserWhereUniqueInput;
+    user: User;
     currentUserId?: number;
 }
 
