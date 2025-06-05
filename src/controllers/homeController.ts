@@ -1,4 +1,4 @@
-import {Request, Response, NextFunction} from "express";
+import {Request, Response} from "express";
 
 export function HomePage(req:Request, res: Response){
     res.render("home", {
